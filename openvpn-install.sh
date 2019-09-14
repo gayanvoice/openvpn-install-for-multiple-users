@@ -13,6 +13,7 @@ elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
 	GROUPNAME=nobody
 else
 	echo "This script only works on Debian, Ubuntu or CentOS"
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users"
 	exit
 fi
 
@@ -35,6 +36,7 @@ newclient () {
 
 if [[ -e /etc/openvpn/server/server.conf ]]; then
 		echo "OpenVPN is already installed"
+		echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users"
 		exit
 else
 	clear
@@ -257,6 +259,7 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	newclient "$CLIENT"
 	echo
 	echo "Completed!"
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users"
 	echo
 	echo "duplicate-cn is added to the server.conf"
 	echo
