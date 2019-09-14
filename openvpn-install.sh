@@ -4,7 +4,7 @@
 #
 
 if [[ "$EUID" -ne 0 ]]; then
-	echo "Run the script as root"
+	echo "Run this script as root"
 	exit
 fi
 
@@ -248,8 +248,8 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	# Generates the custom client.ovpn
 	newclient "$CLIENT"
 	echo
-	echo "Finished!"
+	echo "Completed!"
 	echo
 	echo "Your client configuration is available at:" ~/"$CLIENT.ovpn"
-	echo "If you want to add more clients, you simply need to run this script again!"
+	echo "Please restart the server"
 fi
