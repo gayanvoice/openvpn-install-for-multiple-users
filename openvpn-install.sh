@@ -34,35 +34,8 @@ newclient () {
 }
 
 if [[ -e /etc/openvpn/server/server.conf ]]; then
-	while :
-	do
-	clear
-		echo "OpenVPN is already installed."
-		echo
-		echo "What do you want to do?"
-		echo "   1) Add a new user"
-		echo "   2) Revoke an existing user"
-		echo "   3) Remove OpenVPN"
-		echo "   4) Exit"
-		read -p "Select an option [1-4]: " option
-		case $option in
-			1)
-			echo
-			echo "Tell me a name for the client certificate."
-			exit
-			;;
-			2)
-			echo "Select the existing client certificate you want to revoke:"
-			exit
-			;;
-			3)
-			echo
-			echo "remove OpenVPN?"
-			exit
-			;;
-			4) exit;;
-		esac
-	done
+		echo "OpenVPN is already installed"
+		exit
 else
 	clear
 	echo 'Welcome to this OpenVPN "road warrior" installer!'
