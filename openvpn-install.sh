@@ -1,9 +1,10 @@
 #!/bin/bash
 #
-# https://github.com/Nyr/openvpn-install
+# https://github.com/gayankuruppu/openvpn-install-for-multiple-users
+# This script enables duplicate-cn in server.conf. You can share the same client.ovpn file for multiple users.
+# Based on Nyr https://github.com/Nyr/openvpn-install
 #
-# Copyright (c) 2013 Nyr. Released under the MIT License.
-
+# checks the operating system version
 if [[ -e /etc/debian_version ]]; then
 	OS=debian
 	GROUPNAME=nogroup
@@ -11,7 +12,7 @@ elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
 	OS=centos
 	GROUPNAME=nobody
 else
-	echo "Looks like you aren't running this installer on Debian, Ubuntu or CentOS"
+	echo "This script only works on Debian, Ubuntu or CentOS"
 	exit
 fi
 
@@ -36,7 +37,7 @@ if [[ -e /etc/openvpn/server/server.conf ]]; then
 	while :
 	do
 	clear
-		echo "Looks like OpenVPN is already installed."
+		echo "OpenVPN is already installed."
 		echo
 		echo "What do you want to do?"
 		echo "   1) Add a new user"
@@ -48,92 +49,15 @@ if [[ -e /etc/openvpn/server/server.conf ]]; then
 			1)
 			echo
 			echo "Tell me a name for the client certificate."
-			echo "Please, use one word only, no special characters."
-			read -p "Client name: " -e CLIENT
-			cd /etc/openvpn/server/easy-rsa/
-			EASYRSA_CERT_EXPIRE=3650 ./easyrsa build-client-full $CLIENT nopass
-			# Generates the custom client.ovpn
-			newclient "$CLIENT"
-			echo
-			echo "Client $CLIENT added, configuration is available at:" ~/"$CLIENT.ovpn"
 			exit
 			;;
 			2)
-			# This option could be documented a bit better and maybe even be simplified
-			# ...but what can I say, I want some sleep too
-			NUMBEROFCLIENTS=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep -c "^V")
-			if [[ "$NUMBEROFCLIENTS" = '0' ]]; then
-				echo
-				echo "You have no existing clients!"
-				exit
-			fi
-			echo
 			echo "Select the existing client certificate you want to revoke:"
-			tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
-			if [[ "$NUMBEROFCLIENTS" = '1' ]]; then
-				read -p "Select one client [1]: " CLIENTNUMBER
-			else
-				read -p "Select one client [1-$NUMBEROFCLIENTS]: " CLIENTNUMBER
-			fi
-			CLIENT=$(tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$CLIENTNUMBER"p)
-			echo
-			read -p "Do you really want to revoke access for client $CLIENT? [y/N]: " -e REVOKE
-			if [[ "$REVOKE" = 'y' || "$REVOKE" = 'Y' ]]; then
-				cd /etc/openvpn/server/easy-rsa/
-				./easyrsa --batch revoke $CLIENT
-				EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
-				rm -f pki/reqs/$CLIENT.req
-				rm -f pki/private/$CLIENT.key
-				rm -f pki/issued/$CLIENT.crt
-				rm -f /etc/openvpn/server/crl.pem
-				cp /etc/openvpn/server/easy-rsa/pki/crl.pem /etc/openvpn/server/crl.pem
-				# CRL is read with each client connection, when OpenVPN is dropped to nobody
-				chown nobody:$GROUPNAME /etc/openvpn/server/crl.pem
-				echo
-				echo "Certificate for client $CLIENT revoked!"
-			else
-				echo
-				echo "Certificate revocation for client $CLIENT aborted!"
-			fi
 			exit
 			;;
 			3)
 			echo
-			read -p "Do you really want to remove OpenVPN? [y/N]: " -e REMOVE
-			if [[ "$REMOVE" = 'y' || "$REMOVE" = 'Y' ]]; then
-				PORT=$(grep '^port ' /etc/openvpn/server/server.conf | cut -d " " -f 2)
-				PROTOCOL=$(grep '^proto ' /etc/openvpn/server/server.conf | cut -d " " -f 2)
-				if pgrep firewalld; then
-					IP=$(firewall-cmd --direct --get-rules ipv4 nat POSTROUTING | grep '\-s 10.8.0.0/24 '"'"'!'"'"' -d 10.8.0.0/24 -j SNAT --to ' | cut -d " " -f 10)
-					# Using both permanent and not permanent rules to avoid a firewalld reload.
-					firewall-cmd --remove-port=$PORT/$PROTOCOL
-					firewall-cmd --zone=trusted --remove-source=10.8.0.0/24
-					firewall-cmd --permanent --remove-port=$PORT/$PROTOCOL
-					firewall-cmd --permanent --zone=trusted --remove-source=10.8.0.0/24
-					firewall-cmd --direct --remove-rule ipv4 nat POSTROUTING 0 -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
-					firewall-cmd --permanent --direct --remove-rule ipv4 nat POSTROUTING 0 -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
-				else
-					systemctl disable --now openvpn-iptables.service
-					rm -f /etc/systemd/system/openvpn-iptables.service
-				fi
-				if sestatus 2>/dev/null | grep "Current mode" | grep -q "enforcing" && [[ "$PORT" != '1194' ]]; then
-					semanage port -d -t openvpn_port_t -p $PROTOCOL $PORT
-				fi
-				systemctl disable --now openvpn-server@server.service
-				rm -rf /etc/openvpn/server
-				rm -f /etc/systemd/system/openvpn-server@server.service.d/disable-limitnproc.conf
-				rm -f /etc/sysctl.d/30-openvpn-forward.conf
-				if [[ "$OS" = 'debian' ]]; then
-					apt-get remove --purge -y openvpn
-				else
-					yum remove openvpn -y
-				fi
-				echo
-				echo "OpenVPN removed!"
-			else
-				echo
-				echo "Removal aborted!"
-			fi
+			echo "remove OpenVPN?"
 			exit
 			;;
 			4) exit;;
