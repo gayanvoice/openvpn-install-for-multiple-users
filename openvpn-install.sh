@@ -2,9 +2,40 @@
 #
 # https://github.com/Nyr/openvpn-install
 #
+# Copyright (c) 2013 Nyr. Released under the MIT License.
+
+
+if grep -qs "Ubuntu 16.04" "/etc/os-release"; then
+	echo 'Ubuntu 16.04 is no longer supported in the current version of openvpn-install
+Use an older version if Ubuntu 16.04 support is needed: https://git.io/vpn1604'
+	exit
+fi
+
+# Detect Debian users running the script with "sh" instead of bash
+if readlink /proc/$$/exe | grep -q "dash"; then
+	echo "This script needs to be run with bash, not sh"
+	exit
+fi
 
 if [[ "$EUID" -ne 0 ]]; then
-	echo "Run this script as root"
+	echo "Sorry, you need to run this as root"
+	exit
+fi
+
+if [[ ! -e /dev/net/tun ]]; then
+	echo "The TUN device is not available
+You need to enable TUN before running this script"
+	exit
+fi
+
+if [[ -e /etc/debian_version ]]; then
+	OS=debian
+	GROUPNAME=nogroup
+elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
+	OS=centos
+	GROUPNAME=nobody
+else
+	echo "Looks like you aren't running this installer on Debian, Ubuntu or CentOS"
 	exit
 fi
 
@@ -24,7 +55,6 @@ newclient () {
 	sed -ne '/BEGIN OpenVPN Static key/,$ p' /etc/openvpn/server/ta.key >> ~/$1.ovpn
 	echo "</tls-auth>" >> ~/$1.ovpn
 }
-
 
 if [[ -e /etc/openvpn/server/server.conf ]]; then
 	while :
@@ -135,23 +165,25 @@ if [[ -e /etc/openvpn/server/server.conf ]]; then
 	done
 else
 	clear
-	echo 'Welcome to this OpenVPN Installer for Multiple Users!'
-	echo 'Enabled duplicate-cn in the Server'
+	echo 'Welcome to this OpenVPN "road warrior" installer!'
 	echo
 	# OpenVPN setup and first user creation
-	echo "Listening to Public IP"
+	echo "I need to ask you a few questions before starting the setup."
+	echo "You can leave the default options and just press enter if you are ok with them."
+	echo
+	echo "First, provide the IPv4 address of the network interface you want OpenVPN"
+	echo "listening to."
 	# Autodetect IP address and pre-fill for the user
 	IP=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
-	read -p "IP Address: " -e -i $IP IP
-
-	# If $IP is a private IP address, the server must be behind NAT
+	read -p "IP address: " -e -i $IP IP
+	# If $IP is a private IP address, the server must be behind NAT
 	if echo "$IP" | grep -qE '^(10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|192\.168)'; then
 		echo
-		echo "Enter Public IPv4 Address:"
-		read -p "Public IP address: " -e PUBLICIP
+		echo "This server is behind NAT. What is the public IPv4 address or hostname?"
+		read -p "Public IP address / hostname: " -e PUBLICIP
 	fi
 	echo
-	echo "OpenVPN protocol (default UDP):"
+	echo "Which protocol do you want for OpenVPN connections?"
 	echo "   1) UDP (recommended)"
 	echo "   2) TCP"
 	read -p "Protocol [1-2]: " -e -i 1 PROTOCOL
@@ -164,10 +196,10 @@ else
 		;;
 	esac
 	echo
-	echo "OpenVPN port (default 1194):"
+	echo "What port do you want OpenVPN listening to?"
 	read -p "Port: " -e -i 1194 PORT
 	echo
-	echo "Select DNS (default System):"
+	echo "Which DNS do you want to use with the VPN?"
 	echo "   1) Current system resolvers"
 	echo "   2) 1.1.1.1"
 	echo "   3) Google"
@@ -175,18 +207,18 @@ else
 	echo "   5) Verisign"
 	read -p "DNS [1-5]: " -e -i 1 DNS
 	echo
-	echo "Enter Certificate Name (default client)"
-	read -p "Client Name: " -e -i client CLIENT
+	echo "Finally, tell me your name for the client certificate."
+	echo "Please, use one word only, no special characters."
+	read -p "Client name: " -e -i client CLIENT
 	echo
+	echo "Okay, that was all I needed. We are ready to set up your OpenVPN server now."
 	read -n1 -r -p "Press any key to continue..."
-
 	# If running inside a container, disable LimitNPROC to prevent conflicts
 	if systemd-detect-virt -cq; then
 		mkdir /etc/systemd/system/openvpn-server@server.service.d/ 2>/dev/null
 		echo '[Service]
 LimitNPROC=infinity' > /etc/systemd/system/openvpn-server@server.service.d/disable-limitnproc.conf
 	fi
-
 	if [[ "$OS" = 'debian' ]]; then
 		apt-get update
 		apt-get install openvpn iptables openssl ca-certificates -y
@@ -195,7 +227,6 @@ LimitNPROC=infinity' > /etc/systemd/system/openvpn-server@server.service.d/disab
 		yum install epel-release -y
 		yum install openvpn iptables openssl ca-certificates -y
 	fi
-
 	# Get easy-rsa
 	EASYRSAURL='https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.5/EasyRSA-nix-3.0.5.tgz'
 	wget -O ~/easyrsa.tgz "$EASYRSAURL" 2>/dev/null || curl -Lo ~/easyrsa.tgz "$EASYRSAURL"
@@ -233,10 +264,10 @@ dev tun
 sndbuf 0
 rcvbuf 0
 ca ca.crt
-duplicate-cn
 cert server.crt
 key server.key
 dh dh.pem
+duplicate-cn
 auth SHA512
 tls-auth ta.key 0
 topology subnet
@@ -357,8 +388,8 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	# Generates the custom client.ovpn
 	newclient "$CLIENT"
 	echo
-	echo "Completed!"
+	echo "Finished!"
 	echo
 	echo "Your client configuration is available at:" ~/"$CLIENT.ovpn"
-	echo "Please restart the server"
+	echo "If you want to add more clients, you simply need to run this script again!"
 fi
