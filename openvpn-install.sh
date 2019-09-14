@@ -4,30 +4,6 @@
 #
 # Copyright (c) 2013 Nyr. Released under the MIT License.
 
-
-if grep -qs "Ubuntu 16.04" "/etc/os-release"; then
-	echo 'Ubuntu 16.04 is no longer supported in the current version of openvpn-install
-Use an older version if Ubuntu 16.04 support is needed: https://git.io/vpn1604'
-	exit
-fi
-
-# Detect Debian users running the script with "sh" instead of bash
-if readlink /proc/$$/exe | grep -q "dash"; then
-	echo "This script needs to be run with bash, not sh"
-	exit
-fi
-
-if [[ "$EUID" -ne 0 ]]; then
-	echo "Sorry, you need to run this as root"
-	exit
-fi
-
-if [[ ! -e /dev/net/tun ]]; then
-	echo "The TUN device is not available
-You need to enable TUN before running this script"
-	exit
-fi
-
 if [[ -e /etc/debian_version ]]; then
 	OS=debian
 	GROUPNAME=nogroup
