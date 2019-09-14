@@ -76,10 +76,10 @@ else
 	echo "   5) Verisign"
 	read -p "DNS [1-5]: " -e -i 1 DNS
 	echo
-	echo "Enter the name client certificate (One Word)"
+	echo "Enter the name Client Certificate (One Word)"
 	read -p "Client name: " -e -i client CLIENT
 	echo
-	echo "Okay, that was all I needed. We are ready to set up your OpenVPN server now."
+	echo "Please wait few minutes"
 	read -n1 -r -p "Press any key to continue..."
 	# If running inside a container, disable LimitNPROC to prevent conflicts
 	if systemd-detect-virt -cq; then
@@ -256,8 +256,11 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	# Generates the custom client.ovpn
 	newclient "$CLIENT"
 	echo
-	echo "Finished!"
+	echo "Completed!"
 	echo
-	echo "Your client configuration is available at:" ~/"$CLIENT.ovpn"
-	echo "If you want to add more clients, you simply need to run this script again!"
+	echo "duplicate-cn is added to the server.config"
+	echo
+	echo "Now you can share the client certificate with unlimited number of users"
+	echo
+	echo "The client configuration is available at:" ~/"$CLIENT.ovpn"
 fi
