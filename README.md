@@ -1,4 +1,4 @@
-# OpenVPN for Multiple Users Install
+# OpenVPN Install for Multiple Users
 Share the same client-certificate with everyone | Enabled duplicate-cn | Best for VPN startups
 
 ## Installation
