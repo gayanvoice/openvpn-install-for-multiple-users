@@ -4,6 +4,31 @@
 # This script enables duplicate-cn in server.conf. You can share the same client.ovpn file for multiple users.
 # Based on Nyr https://github.com/Nyr/openvpn-install
 #
+# checks if ubuntu is 1604
+if grep -qs "Ubuntu 16.04" "/etc/os-release"; then
+	echo 'Ubuntu 16.04 is no longer supported'
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
+	exit
+fi
+# cehcks if run in bash
+if readlink /proc/$$/exe | grep -q "dash"; then
+	echo "This script needs to be run with bash, not sh"
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
+	exit
+fi
+# checks if run in root
+if [[ "$EUID" -ne 0 ]]; then
+	echo "Run this as root"
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
+	exit
+fi
+# checks if tun device is enabled
+if [[ ! -e /dev/net/tun ]]; then
+	echo "The TUN device is not enabled"
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
+	exit
+fi
+
 # checks the operating system version
 if [[ -e /etc/debian_version ]]; then
 	OS=debian
@@ -13,7 +38,7 @@ elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
 	GROUPNAME=nobody
 else
 	echo "This script only works on Debian, Ubuntu or CentOS"
-	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users"
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
 	exit
 fi
 
@@ -36,11 +61,16 @@ newclient () {
 
 if [[ -e /etc/openvpn/server/server.conf ]]; then
 		echo "OpenVPN is already installed"
-		echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users"
+		echo
+		echo "Still you can't connect multiple users to the OpenVPN server?"
+		echo "Restart the server!"
+		echo
+		echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
 		exit
 else
 	clear
 	echo 'Install OpenVPN for Multiple Users'
+	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
 	echo
 	# OpenVPN setup and first user creation
 	echo "Listening to IPv4 Address."
@@ -259,7 +289,7 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	newclient "$CLIENT"
 	echo
 	echo "Completed!"
-	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users"
+ 	echo "Go to https://github.com/gayankuruppu/openvpn-install-for-multiple-users for FAQ"
 	echo
 	echo "duplicate-cn is added to the server.conf"
 	echo
