@@ -258,9 +258,10 @@ verb 3" > /etc/openvpn/server/client-common.txt
 	echo
 	echo "Completed!"
 	echo
-	echo "duplicate-cn is added to the server.config"
+	echo "duplicate-cn is added to the server.conf"
 	echo
 	echo "Now you can share the client certificate with unlimited number of users"
+	echo "Please restart the server"
 	echo
 	echo "The client configuration is available at:" ~/"$CLIENT.ovpn"
 fi
