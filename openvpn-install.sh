@@ -76,8 +76,7 @@ else
 	echo "   5) Verisign"
 	read -p "DNS [1-5]: " -e -i 1 DNS
 	echo
-	echo "Finally, tell me your name for the client certificate."
-	echo "Please, use one word only, no special characters."
+	echo "Enter the name client certificate (One Word)"
 	read -p "Client name: " -e -i client CLIENT
 	echo
 	echo "Okay, that was all I needed. We are ready to set up your OpenVPN server now."
