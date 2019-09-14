@@ -38,25 +38,21 @@ if [[ -e /etc/openvpn/server/server.conf ]]; then
 		exit
 else
 	clear
-	echo 'Welcome to this OpenVPN "road warrior" installer!'
+	echo 'Install OpenVPN for Multiple Users'
 	echo
 	# OpenVPN setup and first user creation
-	echo "I need to ask you a few questions before starting the setup."
-	echo "You can leave the default options and just press enter if you are ok with them."
-	echo
-	echo "First, provide the IPv4 address of the network interface you want OpenVPN"
-	echo "listening to."
+	echo "Listening to IPv4 Address."
 	# Autodetect IP address and pre-fill for the user
 	IP=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
 	read -p "IP address: " -e -i $IP IP
 	# If $IP is a private IP address, the server must be behind NAT
 	if echo "$IP" | grep -qE '^(10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|192\.168)'; then
 		echo
-		echo "This server is behind NAT. What is the public IPv4 address or hostname?"
-		read -p "Public IP address / hostname: " -e PUBLICIP
+		echo "Enter Public IPv4 Address"
+		read -p "Public IP Address: " -e PUBLICIP
 	fi
 	echo
-	echo "Which protocol do you want for OpenVPN connections?"
+	echo "Choose OpenVPN Protocol (default UDP):"
 	echo "   1) UDP (recommended)"
 	echo "   2) TCP"
 	read -p "Protocol [1-2]: " -e -i 1 PROTOCOL
@@ -69,10 +65,10 @@ else
 		;;
 	esac
 	echo
-	echo "What port do you want OpenVPN listening to?"
+	echo "Enter OpenVPN Port (default 1194)"
 	read -p "Port: " -e -i 1194 PORT
 	echo
-	echo "Which DNS do you want to use with the VPN?"
+	echo "Choose DNS for VPN (default System)"
 	echo "   1) Current system resolvers"
 	echo "   2) 1.1.1.1"
 	echo "   3) Google"
