@@ -6,7 +6,8 @@ Share the same client-certificate with everyone | Enabled duplicate-cn | Best fo
 * Enable 'tun' device before running this script
 ```
 cat /dev/net/tun
-cat: /dev/net/tun: File descriptor in bad state
+# if you receive this message, your 'tun' device is running
+# cat: /dev/net/tun: File descriptor in bad state
 ```
 * This script run on 'bash', not 'sh' for Debian users
 ```
