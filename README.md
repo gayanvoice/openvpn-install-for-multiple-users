@@ -1,5 +1,5 @@
 # OpenVPN Install for Multiple Users
-Share the same client-certificate with everyone | Enabled duplicate-cn | Best for VPN startups
+Share the same client-certificate with everyone. This script pre-enabled the duplicate-cn.
 
 ## Installation
 Run this script
@@ -7,15 +7,15 @@ Run this script
 wget https://git.io/JeYgM -O openvpn-install.sh && bash openvpn-install.sh
 ```
 ## OpenVPN Server
-### Start
+### * Start
 ```
 service openvpn start
 ```
-### Status
+### * Status
 ```
 service openvpn status
 ```
-### Stop
+### * Stop
 ```
 service openvpn stop
 ```
