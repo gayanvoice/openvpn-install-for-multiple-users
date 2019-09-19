@@ -6,6 +6,19 @@ Run this script
 ```
 wget https://git.io/JeYgM -O openvpn-install.sh && bash openvpn-install.sh
 ```
+## OpenVPN Server
+### Start
+```
+service openvpn start
+```
+### Status
+```
+service openvpn status
+```
+### Stop
+```
+service openvpn stop
+```
 
 ## Remove
 * Uninstall OpenVPN
