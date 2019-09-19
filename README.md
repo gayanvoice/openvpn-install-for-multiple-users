@@ -2,7 +2,7 @@
 Share the same client-certificate with everyone. This script pre-enabled the duplicate-cn.
 
 ## Watch video
-[![Install OpenVPN for multiple users on Ubuntu](https://img.youtube.com/vi/lBelfmMkQYU/1.jpg)](https://www.youtube.com/watch?v=lBelfmMkQYU)
+[![Install OpenVPN for multiple users on Ubuntu](https://img.youtube.com/vi/lBelfmMkQYU/0.jpg)](https://www.youtube.com/watch?v=lBelfmMkQYU)
 
 ## Installation
 Run this script
