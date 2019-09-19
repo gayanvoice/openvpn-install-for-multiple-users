@@ -7,15 +7,15 @@ Run this script
 wget https://git.io/JeYgM -O openvpn-install.sh && bash openvpn-install.sh
 ```
 ## OpenVPN Server
-### * Start
+### Start
 ```
 service openvpn start
 ```
-### * Status
+### Status
 ```
 service openvpn status
 ```
-### * Stop
+### Stop
 ```
 service openvpn stop
 ```
