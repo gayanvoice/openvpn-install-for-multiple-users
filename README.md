@@ -7,7 +7,7 @@ Share the same client-certificate with everyone. This script pre-enabled the dup
 ## Installation
 Run this script
 ```
-wget https://git.io/JeYgM -O openvpn-install.sh && bash openvpn-install.sh
+wget https://git.io/JeFPU -O openvpn-install.sh && bash openvpn-install.sh
 ```
 ## OpenVPN Server
 * Start
