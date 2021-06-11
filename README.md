@@ -1,5 +1,9 @@
-# OpenVPN Install for Multiple Users
-[![HitCount](http://hits.dwyl.io/gayanvoice/openvpn-install-for-multiple-users.svg)](http://hits.dwyl.io/gayanvoice/openvpn-install-for-multiple-users)
+# OpenVPN Install for Multiple Users [<img alt="Image of insights" src="https://github.com/gayanvoice/insights/blob/master/graph/208378302/small/week.png" height="20">](https://github.com/gayanvoice/insights/blob/master/readme/208378302/week.md)
+
+[![Image of insights](https://github.com/gayanvoice/insights/blob/master/svg/208378302/badge.svg)](https://github.com/gayanvoice/insights/blob/master/readme/208378302/week.md)
+
+| Set up 📈  [GitHub Insights](https://github.com/gayanvoice/github-insights-template) counter to track how many people have viewed your GitHub repositories |
+| ---- |
 
 Share the same client-certificate with everyone. This script pre-enabled the duplicate-cn.
 
